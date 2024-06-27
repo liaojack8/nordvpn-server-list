@@ -2,7 +2,7 @@ name: Update
 
 on:
   schedule:
-    - cron:  '0 0 * * 0'
+    - cron:  '0 6 * * *'
 
   workflow_dispatch:
 
@@ -16,13 +16,12 @@ jobs:
       - name: Download server lists and update list files
         run: |
           mkdir -p generic
-          mkdir -p foxyproxy
           declare -a countrycode=("au" "ca" "fr" "de" "hk" "in" "jp" "nl" "sg" "se" "ch" "tw" "uk" "us")
           declare -a countryid=("13" "38" "74" "81" "97" "100" "108" "153" "195" "208" "209" "211" "227" "228")
           for (( i=0; i<${#countrycode[@]}; i++ ));
           do
-            curl --silent "https://api.nordvpn.com/v1/servers/recommendations?filters\[country_id\]=${countryid[$i]}&filters\[servers_technologies\]\[identifier\]=proxy_ssl&limit=100" | jq --raw-output '.[].hostname' > generic/${countrycode[$i]}.txt
-            cat generic/${countrycode[$i]}.txt | while read line; do echo "ssl://username:password@${line}:89" >> foxyproxy/${countrycode[$i]}.txt; done
+            curl --silent "https://api.nordvpn.com/v1/servers/recommendations?filters\[country_id\]=${countryid[$i]}&limit=1" | jq --raw-output '.[].technologies[].metadata[].value' > generic/${countrycode[$i]}.txt
+            curl --silent "https://api.nordvpn.com/v1/servers/recommendations?filters\[country_id\]=${countryid[$i]}&limit=10" | jq --raw-output '.[].hostname' > generic/${countrycode[$i]}.txt
           done
 
       - name: Commit and push changes
