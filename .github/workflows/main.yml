@@ -21,7 +21,7 @@ jobs:
           for (( i=0; i<${#countrycode[@]}; i++ ));
           do
             curl --silent "https://api.nordvpn.com/v1/servers/recommendations?filters\[country_id\]=${countryid[$i]}&limit=1" | jq --raw-output '.[].technologies[].metadata[].value' > generic/${countrycode[$i]}.txt
-            curl --silent "https://api.nordvpn.com/v1/servers/recommendations?filters\[country_id\]=${countryid[$i]}&limit=10" | jq --raw-output '.[].hostname' > generic/${countrycode[$i]}.txt
+            curl --silent "https://api.nordvpn.com/v1/servers/recommendations?filters\[country_id\]=${countryid[$i]}&limit=10" | jq --raw-output '.[].hostname' >> generic/${countrycode[$i]}.txt
           done
 
       - name: Commit and push changes
